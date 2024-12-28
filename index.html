@@ -31,7 +31,10 @@
         }
 
         .input-container {
-            margin: 20px 0;
+            position: absolute;
+            bottom: 20px;
+            width: 100%;
+            text-align: center;
         }
 
         .input-container input {
@@ -92,11 +95,6 @@
 <body>
     <canvas id="fireworkCanvas"></canvas>
 
-    <div class="input-container">
-        <input type="text" id="nameInput" placeholder="Entrez votre nom">
-        <button class="btn" onclick="displayMessage()">Envoyer</button>
-    </div>
-
     <h1 id="personalMessage"></h1>
     <p>Que cette nouvelle année vous apporte joie, santé et prospérité.</p>
     <p id="countdown"></p>
@@ -105,6 +103,13 @@
         <button class="share-button whatsapp" id="whatsappShare">Partager sur WhatsApp</button>
         <button class="share-button facebook" id="facebookShare">Partager sur Facebook</button>
     </div>
+
+    <div class="input-container">
+        <input type="text" id="nameInput" placeholder="Entrez votre nom">
+        <button class="btn" onclick="displayMessage()">Envoyer</button>
+    </div>
+
+    <audio id="fireworkSound" src="https://www.soundjay.com/button/beep-07.wav" preload="auto"></audio>
 
     <script>
         // Message personnalisé
@@ -176,9 +181,10 @@
                 `Temps restant avant 2025 : ${days}j ${hours}h ${minutes}m ${seconds}s`;
         }
 
-        // Feux d'artifice (similaire à l'exemple précédent)
+        // Feux d'artifice
         const canvas = document.getElementById('fireworkCanvas');
         const ctx = canvas.getContext('2d');
+        const fireworkSound = document.getElementById('fireworkSound');
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
 
@@ -204,6 +210,8 @@
                 if (Math.abs(dx) < 5 && Math.abs(dy) < 5) {
                     createParticles(this.targetX, this.targetY);
                     fireworks.splice(index, 1);
+                    fireworkSound.currentTime = 0; // Reset sound
+                    fireworkSound.play();
                 }
             }
 
@@ -245,7 +253,7 @@
         }
 
         function createParticles(x, y) {
-            for (let i = 0; i < 30; i++) {
+            for (let i = 0; i < 50; i++) { // Plus de particules
                 particles.push(new Particle(x, y));
             }
         }
@@ -259,7 +267,7 @@
             particles.forEach((particle, index) => particle.update(index));
             particles.forEach(particle => particle.draw());
 
-            if (Math.random() < 0.05) {
+            if (Math.random() < 0.2) { // Plus de feux d'artifice
                 const x = Math.random() * canvas.width;
                 const targetX = Math.random() * canvas.width;
                 const targetY = Math.random() * canvas.height / 2;
