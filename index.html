@@ -1,182 +1,281 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Bonne Année 2025</title>
-  <style>
-    /* Styles généraux */
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #000;
-      color: #fff;
-      text-align: center;
-      overflow: hidden;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bonne Année 2025</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to bottom, #000428, #004e92);
+            color: #fff;
+            text-align: center;
+            overflow: hidden;
+        }
 
-    h1, h2 {
-      margin: 0;
-      font-weight: bold;
-    }
+        h1 {
+            font-size: 2.5em;
+            margin: 20px 0;
+        }
 
-    /* Animation multicouleur */
-    .multicolor {
-      font-size: 3rem;
-      font-weight: bold;
-      margin-top: 20px;
-    }
+        p {
+            font-size: 1.5em;
+            margin: 20px 0;
+        }
 
-    .multicolor span {
-      display: inline-block;
-      animation: colorchange 2s infinite;
-    }
+        #countdown {
+            font-size: 1.5em;
+            color: #ffcc00;
+        }
 
-    .multicolor span:nth-child(1) { color: red; }
-    .multicolor span:nth-child(2) { color: orange; }
-    .multicolor span:nth-child(3) { color: yellow; }
-    .multicolor span:nth-child(4) { color: green; }
-    .multicolor span:nth-child(5) { color: blue; }
-    .multicolor span:nth-child(6) { color: violet; }
+        .input-container {
+            position: absolute;
+            bottom: 20px;
+            width: 100%;
+            text-align: center;
+        }
 
-    @keyframes colorchange {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.2); }
-    }
+        .input-container input {
+            padding: 10px;
+            font-size: 1em;
+            border-radius: 5px;
+            border: none;
+            margin-right: 10px;
+        }
 
-    /* Minuteur */
-    .countdown {
-      margin: 20px 0;
-      font-size: 1.5rem;
-      color: yellow;
-    }
+        .btn {
+            padding: 10px 20px;
+            font-size: 1em;
+            color: #004e92;
+            background-color: #ffcc00;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
 
-    /* Formulaire en bas */
-    .form-container {
-      position: absolute;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      text-align: center;
-    }
+        .btn:hover {
+            background-color: #ffd700;
+        }
 
-    input, button {
-      padding: 10px;
-      font-size: 1rem;
-      border: none;
-      border-radius: 5px;
-      margin: 5px;
-    }
+        .share-buttons {
+            margin: 20px 0;
+        }
 
-    button {
-      background: #ff9800;
-      color: #fff;
-      cursor: pointer;
-    }
+        .share-buttons button {
+            padding: 10px 15px;
+            margin: 5px;
+            font-size: 1em;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
 
-    button:hover {
-      background: #ffa726;
-    }
+        .whatsapp {
+            background-color: #25D366;
+            color: white;
+        }
 
-    /* Feux d'artifice */
-    .firework {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-    }
-  </style>
+        .facebook {
+            background-color: #4267B2;
+            color: white;
+        }
+
+        #fireworkCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+    </style>
 </head>
 <body>
-  <!-- Feux d'artifice -->
-  <div id="fireworks-container" class="firework"></div>
+    <canvas id="fireworkCanvas"></canvas>
 
-  <!-- Message de Nouvel An -->
-  <h2 id="greeting"></h2>
-  <h1 class="multicolor" id="name-display">
-    <span>N</span><span>O</span><span>M</span>
-  </h1>
-  <h2>Bonne Année 2025 !</h2>
-  <p>Que cette nouvelle année vous apporte joie, santé et prospérité.</p>
-  <div class="countdown" id="countdown"></div>
+    <h1 id="personalMessage"></h1>
+    <p>Que cette nouvelle année vous apporte joie, santé et prospérité.</p>
+    <p id="countdown"></p>
 
-  <!-- Formulaire de saisie -->
-  <div class="form-container">
-    <input type="text" id="name-input" placeholder="Entrez votre nom" />
-    <button onclick="updateName()">Envoyer</button>
-    <button onclick="shareOnWhatsApp()">Partager sur WhatsApp</button>
-    <button onclick="shareOnFacebook()">Partager sur Facebook</button>
-  </div>
+    <div class="share-buttons">
+        <button class="share-button whatsapp" id="whatsappShare">Partager sur WhatsApp</button>
+        <button class="share-button facebook" id="facebookShare">Partager sur Facebook</button>
+    </div>
 
-  <!-- Son des feux d'artifice -->
-  <audio id="firework-sound" src="https://www.soundjay.com/button/beep-07.mp3" preload="auto"></audio>
+    <div class="input-container">
+        <input type="text" id="nameInput" placeholder="Entrez votre nom">
+        <button class="btn" onclick="displayMessage()">Envoyer</button>
+    </div>
 
-  <script>
-    // Mise à jour du nom dans l'affichage
-    function updateName() {
-      const name = document.getElementById("name-input").value || "Nom";
-      const greeting = `${name}, vous souhaite une`;
-      document.getElementById("greeting").innerText = greeting;
-      const spans = document.getElementById("name-display").querySelectorAll("span");
-      for (let i = 0; i < spans.length; i++) {
-        spans[i].innerText = name[i] || '';
-      }
-    }
+    <audio id="fireworkSound" src="https://www.soundjay.com/button/beep-07.wav" preload="auto"></audio>
 
-    // Minuteur pour 2025
-    function startCountdown() {
-      const targetDate = new Date('2025-01-01T00:00:00').getTime();
-      setInterval(() => {
-        const now = new Date().getTime();
-        const distance = targetDate - now;
-        const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-        document.getElementById("countdown").innerText =
-          `Temps restant avant 2025 : ${days}j ${hours}h ${minutes}m ${seconds}s`;
-      }, 1000);
-    }
+    <script>
+        // Message personnalisé
+        function displayMessage() {
+            const name = document.getElementById('nameInput').value.trim();
+            const message = document.getElementById('personalMessage');
 
-    // Effet de feux d'artifice
-    function startFireworks() {
-      const container = document.getElementById("fireworks-container");
-      setInterval(() => {
-        const firework = document.createElement("div");
-        firework.style.position = "absolute";
-        firework.style.width = "10px";
-        firework.style.height = "10px";
-        firework.style.borderRadius = "50%";
-        firework.style.background = `hsl(${Math.random() * 360}, 100%, 50%)`;
-        firework.style.left = Math.random() * window.innerWidth + "px";
-        firework.style.top = Math.random() * window.innerHeight + "px";
-        container.appendChild(firework);
-        setTimeout(() => container.removeChild(firework), 1500);
-        document.getElementById("firework-sound").play();
-      }, 200);
-    }
+            if (name) {
+                message.textContent = `${name} vous souhaite une bonne année 2025 !`;
+                updateShareLinks(name);
+            } else {
+                message.textContent = "Cher visiteur, vous souhaite une bonne année 2025 !";
+            }
+        }
 
-    // Partage sur WhatsApp
-    function shareOnWhatsApp() {
-      const name = document.getElementById("name-input").value || "Nom";
-      const url = `https://wa.me/?text=Joyeuse année 2025 ! ${name} vous souhaite une excellente année ! Essayez ici : ${window.location.href}`;
-      window.open(url, '_blank');
-    }
+        // Mise à jour des liens de partage
+        function updateShareLinks(name) {
+            const baseUrl = window.location.href.split('?')[0];
+            const shareUrl = `${baseUrl}?nom=${encodeURIComponent(name)}`;
 
-    // Partage sur Facebook
-    function shareOnFacebook() {
-      const name = document.getElementById("name-input").value || "Nom";
-      const url = `https://www.facebook.com/sharer/sharer.php?u=${window.location.href}&quote=Joyeuse année 2025 ! ${name} vous souhaite une excellente année !`;
-      window.open(url, '_blank');
-    }
+            // Lien WhatsApp
+            const whatsappLink = `https://wa.me/?text=Découvrez ce site : ${shareUrl}`;
+            document.getElementById('whatsappShare').onclick = function () {
+                window.open(whatsappLink, '_blank');
+            };
 
-    // Initialisation
-    window.onload = () => {
-      startCountdown();
-      startFireworks();
-    };
-  </script>
+            // Lien Facebook
+            const facebookLink = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`;
+            document.getElementById('facebookShare').onclick = function () {
+                window.open(facebookLink, '_blank');
+            };
+        }
+
+        // Récupération du paramètre "nom" dans l'URL
+        function getQueryParam(param) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(param);
+        }
+
+        // Initialisation
+        window.onload = function () {
+            const nameFromUrl = getQueryParam('nom');
+            if (nameFromUrl) {
+                document.getElementById('nameInput').value = nameFromUrl;
+                displayMessage();
+            }
+
+            setInterval(updateCountdown, 1000);
+            loop(); // Lancer l'animation des feux d'artifice
+        };
+
+        // Compte à rebours
+        function updateCountdown() {
+            const now = new Date();
+            const newYear = new Date('2025-01-01T00:00:00');
+            const timeLeft = newYear - now;
+
+            if (timeLeft <= 0) {
+                document.getElementById('countdown').textContent = "Bonne Année 2025 ! 🎉";
+                return;
+            }
+
+            const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+
+            document.getElementById('countdown').textContent =
+                `Temps restant avant 2025 : ${days}j ${hours}h ${minutes}m ${seconds}s`;
+        }
+
+        // Feux d'artifice
+        const canvas = document.getElementById('fireworkCanvas');
+        const ctx = canvas.getContext('2d');
+        const fireworkSound = document.getElementById('fireworkSound');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const fireworks = [];
+        const particles = [];
+
+        class Firework {
+            constructor(x, y, targetX, targetY) {
+                this.x = x;
+                this.y = y;
+                this.targetX = targetX;
+                this.targetY = targetY;
+                this.speed = 5;
+            }
+
+            update(index) {
+                const dx = this.targetX - this.x;
+                const dy = this.targetY - this.y;
+                const angle = Math.atan2(dy, dx);
+                this.x += Math.cos(angle) * this.speed;
+                this.y += Math.sin(angle) * this.speed;
+
+                if (Math.abs(dx) < 5 && Math.abs(dy) < 5) {
+                    createParticles(this.targetX, this.targetY);
+                    fireworks.splice(index, 1);
+                    fireworkSound.currentTime = 0; // Reset sound
+                    fireworkSound.play();
+                }
+            }
+
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, 2, 0, Math.PI * 2);
+                ctx.fillStyle = `hsl(${Math.random() * 360}, 100%, 50%)`;
+                ctx.fill();
+            }
+        }
+
+        class Particle {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.life = 50;
+                this.size = Math.random() * 2 + 1;
+                this.speedX = Math.random() * 3 - 1.5;
+                this.speedY = Math.random() * 3 - 1.5;
+                this.color = `hsl(${Math.random() * 360}, 100%, 50%)`;
+            }
+
+            update(index) {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                this.life -= 1;
+
+                if (this.life <= 0) {
+                    particles.splice(index, 1);
+                }
+            }
+
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+            }
+        }
+
+        function createParticles(x, y) {
+            for (let i = 0; i < 50; i++) { // Plus de particules
+                particles.push(new Particle(x, y));
+            }
+        }
+
+        function loop() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            fireworks.forEach((firework, index) => firework.update(index));
+            fireworks.forEach(firework => firework.draw());
+
+            particles.forEach((particle, index) => particle.update(index));
+            particles.forEach(particle => particle.draw());
+
+            if (Math.random() < 0.2) { // Plus de feux d'artifice
+                const x = Math.random() * canvas.width;
+                const targetX = Math.random() * canvas.width;
+                const targetY = Math.random() * canvas.height / 2;
+                fireworks.push(new Firework(x, canvas.height, targetX, targetY));
+            }
+
+            requestAnimationFrame(loop);
+        }
+    </script>
 </body>
 </html>
